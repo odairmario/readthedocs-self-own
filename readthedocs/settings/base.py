@@ -10,6 +10,7 @@ from celery.schedules import crontab
 
 from readthedocs.core.logs import shared_processors
 from readthedocs.core.settings import Settings
+from .env_wrapper import env
 
 
 try:
@@ -34,117 +35,119 @@ class CommunityBaseSettings(Settings):
     """Community base settings, don't use this directly."""
 
     # Django settings
-    SITE_ID = 1
-    ROOT_URLCONF = 'readthedocs.urls'
-    LOGIN_REDIRECT_URL = '/dashboard/'
-    FORCE_WWW = False
-    SECRET_KEY = 'replace-this-please'  # noqa
-    ATOMIC_REQUESTS = True
+    SITE_ID = env("SITE_ID", 1)
+    ROOT_URLCONF = env("ROOT_URLCONF", 'readthedocs.urls')
+    LOGIN_REDIRECT_URL = env("LOGIN_REDIRECT_URL", '/dashboard/')
+    FORCE_WWW = env("FORCE_WWW", False,is_bool=True)
+    SECRET_KEY = env("SECRET_KEY", 'replace-this-please')
+    ATOMIC_REQUESTS = env("ATOMIC_REQUESTS", True,is_bool=True)
 
-    DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+    DEFAULT_AUTO_FIELD = env("DEFAULT_AUTO_FIELD", 'django.db.models.AutoField')
 
     # Debug settings
-    DEBUG = True
+    DEBUG = env("DEBUG", True,is_bool=True)
 
     # Domains and URLs
-    RTD_IS_PRODUCTION = False
-    PRODUCTION_DOMAIN = 'readthedocs.org'
-    PUBLIC_DOMAIN = None
-    PUBLIC_DOMAIN_USES_HTTPS = False
-    USE_SUBDOMAIN = False
+    RTD_IS_PRODUCTION = env("RTD_IS_PRODUCTION", False,is_bool=True)
+    PRODUCTION_DOMAIN = env("PRODUCTION_DOMAIN", 'docs.c3sl.ufpr.br')
+    PUBLIC_DOMAIN = env("PUBLIC_DOMAIN", None)
+    PUBLIC_DOMAIN_USES_HTTPS = env("PUBLIC_DOMAIN_USES_HTTPS", False,is_bool=True)
+    USE_SUBDOMAIN = env("USE_SUBDOMAIN", False,is_bool=True)
     PUBLIC_API_URL = 'https://{}'.format(PRODUCTION_DOMAIN)
     RTD_INTERSPHINX_URL = 'https://{}'.format(PRODUCTION_DOMAIN)
-    RTD_EXTERNAL_VERSION_DOMAIN = 'external-builds.readthedocs.io'
+    RTD_EXTERNAL_VERSION_DOMAIN = env("RTD_EXTERNAL_VERSION_DOMAIN", 'build.docs.c3sl.ufpr.br')
 
     # Doc Builder Backends
-    MKDOCS_BACKEND = 'readthedocs.doc_builder.backends.mkdocs'
-    SPHINX_BACKEND = 'readthedocs.doc_builder.backends.sphinx'
+    MKDOCS_BACKEND = env("MKDOCS_BACKEND", 'readthedocs.doc_builder.backends.mkdocs')
+    SPHINX_BACKEND = env("SPHINX_BACKEND", 'readthedocs.doc_builder.backends.sphinx')
 
     # slumber settings
-    SLUMBER_API_HOST = 'https://readthedocs.org'
-    SLUMBER_USERNAME = None
-    SLUMBER_PASSWORD = None
+    SLUMBER_API_HOST = env("SLUMBER_API_HOST", 'https://docs.c3sl.ufpr.br')
+    SLUMBER_USERNAME = env("SLUMBER_USERNAME", None)
+    SLUMBER_PASSWORD = env("SLUMBER_PASSWORD", None)
 
     # Email
-    DEFAULT_FROM_EMAIL = 'no-reply@readthedocs.org'
-    SERVER_EMAIL = DEFAULT_FROM_EMAIL
-    SUPPORT_EMAIL = None
-    SUPPORT_FORM_ENDPOINT = None
+    DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", 'no-reply@docs.c3sl.ufpr.br')
+    SERVER_EMAIL = env("SERVER_EMAIL", DEFAULT_FROM_EMAIL)
+    SUPPORT_EMAIL = env("SUPPORT_EMAIL", None)
+    SUPPORT_FORM_ENDPOINT = env("SUPPORT_FORM_ENDPOINT", None)
 
     # Sessions
-    SESSION_COOKIE_DOMAIN = 'readthedocs.org'
-    SESSION_COOKIE_HTTPONLY = True
-    SESSION_COOKIE_AGE = 30 * 24 * 60 * 60  # 30 days
-    SESSION_SAVE_EVERY_REQUEST = False
+    SESSION_COOKIE_DOMAIN = env("SESSION_COOKIE_DOMAIN", 'docs.c3sl.ufpr.br')
+    SESSION_COOKIE_HTTPONLY = env("SESSION_COOKIE_HTTPONLY", True,is_bool=True)
+    SESSION_COOKIE_AGE = env("SESSION_COOKIE_AGE", 30 * 24 * 60 * 60) # 30 days
+    SESSION_SAVE_EVERY_REQUEST = env("SESSION_SAVE_EVERY_REQUEST", False,is_bool=True)
 
     @property
     def SESSION_COOKIE_SAMESITE(self):
         """
         Cookie used in cross-origin API requests from *.rtd.io to rtd.org/api/v2/sustainability/.
         """
+
         if self.USE_PROMOS:
             return None
         # This is django's default.
+
         return 'Lax'
 
     # CSRF
-    CSRF_COOKIE_HTTPONLY = True
-    CSRF_COOKIE_AGE = 30 * 24 * 60 * 60  # 30 days
+    CSRF_COOKIE_HTTPONLY = env("CSRF_COOKIE_HTTPONLY", True,is_bool=True)
+    CSRF_COOKIE_AGE = env("CSRF_COOKIE_AGE", 30 * 24 * 60 * 60  ) # 30 days
 
     # Security & X-Frame-Options Middleware
     # https://docs.djangoproject.com/en/1.11/ref/middleware/#django.middleware.security.SecurityMiddleware
-    SECURE_BROWSER_XSS_FILTER = True
-    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_BROWSER_XSS_FILTER = env("SECURE_BROWSER_XSS_FILTER", True,is_bool=True)
+    SECURE_CONTENT_TYPE_NOSNIFF = env("SECURE_CONTENT_TYPE_NOSNIFF", True,is_bool=True)
     SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
-    X_FRAME_OPTIONS = 'DENY'
+    X_FRAME_OPTIONS = env("X_FRAME_OPTIONS", 'DENY')
 
     # Content Security Policy
     # https://django-csp.readthedocs.io/
-    CSP_BLOCK_ALL_MIXED_CONTENT = True
-    CSP_DEFAULT_SRC = None  # This could be improved
+    CSP_BLOCK_ALL_MIXED_CONTENT = env("CSP_BLOCK_ALL_MIXED_CONTENT", True,is_bool=True)
+    CSP_DEFAULT_SRC = env("CSP_DEFAULT_SRC", None)
     CSP_FRAME_ANCESTORS = ("'none'",)
     CSP_OBJECT_SRC = ("'none'",)
-    CSP_REPORT_URI = None
-    CSP_REPORT_ONLY = False
+    CSP_REPORT_URI = env("CSP_REPORT_URI", None)
+    CSP_REPORT_ONLY = env("CSP_REPORT_ONLY", False,is_bool=True)
     CSP_EXCLUDE_URL_PREFIXES = (
         "/admin/",
     )
 
     # Read the Docs
     READ_THE_DOCS_EXTENSIONS = ext
-    RTD_LATEST = 'latest'
-    RTD_LATEST_VERBOSE_NAME = 'latest'
-    RTD_STABLE = 'stable'
-    RTD_STABLE_VERBOSE_NAME = 'stable'
-    RTD_CLEAN_AFTER_BUILD = False
-    RTD_MAX_CONCURRENT_BUILDS = 4
-    RTD_BUILDS_MAX_RETRIES = 25
-    RTD_BUILDS_RETRY_DELAY = 5 * 60  # seconds
-    RTD_BUILD_STATUS_API_NAME = 'docs/readthedocs'
-    RTD_ANALYTICS_DEFAULT_RETENTION_DAYS = 30 * 3
-    RTD_AUDITLOGS_DEFAULT_RETENTION_DAYS = 30 * 3
+    RTD_LATEST = env("RTD_LATEST", 'latest')
+    RTD_LATEST_VERBOSE_NAME = env("RTD_LATEST_VERBOSE_NAME", 'latest')
+    RTD_STABLE = env("RTD_STABLE", 'stable')
+    RTD_STABLE_VERBOSE_NAME = env("RTD_STABLE_VERBOSE_NAME", 'stable')
+    RTD_CLEAN_AFTER_BUILD = env("RTD_CLEAN_AFTER_BUILD", False,is_bool=True)
+    RTD_MAX_CONCURRENT_BUILDS = env("RTD_MAX_CONCURRENT_BUILDS", 4)
+    RTD_BUILDS_MAX_RETRIES = env("RTD_BUILDS_MAX_RETRIES", 25)
+    RTD_BUILDS_RETRY_DELAY = env("RTD_BUILDS_RETRY_DELAY", 5 * 60) # seconds
+    RTD_BUILD_STATUS_API_NAME = env("RTD_BUILD_STATUS_API_NAME", 'docs/readthedocs')
+    RTD_ANALYTICS_DEFAULT_RETENTION_DAYS = env("RTD_ANALYTICS_DEFAULT_RETENTION_DAYS", 30 * 3)
+    RTD_AUDITLOGS_DEFAULT_RETENTION_DAYS = env("RTD_AUDITLOGS_DEFAULT_RETENTION_DAYS", 30 * 3)
 
     # Keep BuildData models on database during this time
-    RTD_TELEMETRY_DATA_RETENTION_DAYS = 30 * 6  # 180 days / 6 months
+    RTD_TELEMETRY_DATA_RETENTION_DAYS = env("RTD_TELEMETRY_DATA_RETENTION_DAYS", 30 * 6  )
 
     # Database and API hitting settings
-    DONT_HIT_API = False
-    DONT_HIT_DB = True
-    RTD_SAVE_BUILD_COMMANDS_TO_STORAGE = False
+    DONT_HIT_API = env("DONT_HIT_API", False,is_bool=True)
+    DONT_HIT_DB = env("DONT_HIT_DB", True,is_bool=True)
+    RTD_SAVE_BUILD_COMMANDS_TO_STORAGE = env("RTD_SAVE_BUILD_COMMANDS_TO_STORAGE", False,is_bool=True)
     DATABASE_ROUTERS = ['readthedocs.core.db.MapAppsRouter']
 
-    USER_MATURITY_DAYS = 7
+    USER_MATURITY_DAYS = env("USER_MATURITY_DAYS", 7)
 
     # override classes
     CLASS_OVERRIDES = {}
 
-    DOC_PATH_PREFIX = '_/'
+    DOC_PATH_PREFIX = env("DOC_PATH_PREFIX", '_/')
 
     @property
     def RTD_EXT_THEME_ENABLED(self):
         return ext_theme and 'RTD_EXT_THEME_ENABLED' in os.environ
 
-    RTD_EXT_THEME_DEV_SERVER = None
+    RTD_EXT_THEME_DEV_SERVER = env("RTD_EXT_THEME_DEV_SERVER", None)
 
     # Application classes
     @property
@@ -214,24 +217,29 @@ class CommunityBaseSettings(Settings):
             'allauth.socialaccount.providers.bitbucket',
             'allauth.socialaccount.providers.bitbucket_oauth2',
         ]
+
         if ext:
             apps.append('readthedocsext.cdn')
             apps.append('readthedocsext.donate')
             apps.append('readthedocsext.spamfighting')
+
         if self.RTD_EXT_THEME_ENABLED:
             apps.append('readthedocsext.theme')
+
         return apps
 
     @property
     def CRISPY_TEMPLATE_PACK(self):
         if self.RTD_EXT_THEME_ENABLED:
             return 'semantic-ui'
+
         return 'bootstrap'
 
     @property
     def CRISPY_ALLOWED_TEMPLATE_PACKS(self):
         if self.RTD_EXT_THEME_ENABLED:
             return ('semantic-ui',)
+
         return ("bootstrap", "uni_form", "bootstrap3", "bootstrap4")
 
     @property
@@ -300,9 +308,9 @@ class CommunityBaseSettings(Settings):
 
     # Assets and media
     STATIC_ROOT = os.path.join(SITE_ROOT, 'static')
-    STATIC_URL = '/static/'
+    STATIC_URL = env("STATIC_URL", '/static/')
     MEDIA_ROOT = os.path.join(SITE_ROOT, 'media/')
-    MEDIA_URL = '/media/'
+    MEDIA_URL = env("MEDIA_URL", '/media/')
     ADMIN_MEDIA_PREFIX = '/media/admin/'
     STATICFILES_DIRS = [
         os.path.join(SITE_ROOT, 'readthedocs', 'static'),
@@ -312,7 +320,7 @@ class CommunityBaseSettings(Settings):
         'readthedocs.core.static.SelectiveFileSystemFinder',
         'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     ]
-    PYTHON_MEDIA = False
+    PYTHON_MEDIA = env("PYTHON_MEDIA", False,is_bool=True)
 
     # Django Storage subclass used to write build artifacts to cloud or local storage
     # https://docs.readthedocs.io/page/development/settings.html#rtd-build-media-storage
@@ -325,11 +333,13 @@ class CommunityBaseSettings(Settings):
     @property
     def TEMPLATES(self):
         dirs = [self.TEMPLATE_ROOT]
+
         if self.RTD_EXT_THEME_ENABLED:
             dirs.insert(0, os.path.join(
                 os.path.dirname(readthedocsext.theme.__file__),
                 'templates',
             ))
+
         return [
             {
                 'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -358,11 +368,11 @@ class CommunityBaseSettings(Settings):
             'PREFIX': 'docs',
         }
     }
-    CACHE_MIDDLEWARE_SECONDS = 60
+    CACHE_MIDDLEWARE_SECONDS = env("CACHE_MIDDLEWARE_SECONDS", 60)
 
     # I18n
-    TIME_ZONE = 'UTC'
-    USE_TZ = True
+    TIME_ZONE = env("TIME_ZONE", 'UTC')
+    USE_TZ = env("USE_TZ", True,is_bool=True)
     LANGUAGE_CODE = 'en-us'
     LANGUAGES = (
         ('ca', gettext('Catalan')),
@@ -385,22 +395,22 @@ class CommunityBaseSettings(Settings):
     LOCALE_PATHS = [
         os.path.join(SITE_ROOT, 'readthedocs', 'locale'),
     ]
-    USE_I18N = True
-    USE_L10N = True
+    USE_I18N = env("USE_I18N", True,is_bool=True)
+    USE_L10N = env("USE_L10N", True,is_bool=True)
 
     # Celery
-    CELERY_APP_NAME = 'readthedocs'
-    CELERY_ALWAYS_EAGER = True
-    CELERYD_TASK_TIME_LIMIT = 60 * 60  # 60 minutes
-    CELERY_SEND_TASK_ERROR_EMAILS = False
-    CELERYD_HIJACK_ROOT_LOGGER = False
+    CELERY_APP_NAME = env("CELERY_APP_NAME", 'readthedocs')
+    CELERY_ALWAYS_EAGER = env("CELERY_ALWAYS_EAGER", True,is_bool=True)
+    CELERYD_TASK_TIME_LIMIT = env("CELERYD_TASK_TIME_LIMIT", 60 * 60)
+    CELERY_SEND_TASK_ERROR_EMAILS = env("CELERY_SEND_TASK_ERROR_EMAILS", False,is_bool=True)
+    CELERYD_HIJACK_ROOT_LOGGER = env("CELERYD_HIJACK_ROOT_LOGGER", False,is_bool=True)
     # This stops us from pre-fetching a task that then sits around on the builder
-    CELERY_ACKS_LATE = True
+    CELERY_ACKS_LATE = env("CELERY_ACKS_LATE", True,is_bool=True)
     # Don't queue a bunch of tasks in the workers
-    CELERYD_PREFETCH_MULTIPLIER = 1
-    CELERY_CREATE_MISSING_QUEUES = True
+    CELERYD_PREFETCH_MULTIPLIER = env("CELERYD_PREFETCH_MULTIPLIER", 1)
+    CELERY_CREATE_MISSING_QUEUES = env("CELERY_CREATE_MISSING_QUEUES", True,is_bool=True)
 
-    CELERY_DEFAULT_QUEUE = 'celery'
+    CELERY_DEFAULT_QUEUE = env("CELERY_DEFAULT_QUEUE", 'celery')
     CELERYBEAT_SCHEDULE = {
         'quarter-finish-inactive-builds': {
             'task': 'readthedocs.projects.tasks.utils.finish_inactive_builds',
@@ -457,13 +467,13 @@ class CommunityBaseSettings(Settings):
     MULTIPLE_BUILD_SERVERS = [CELERY_DEFAULT_QUEUE]
 
     # Sentry
-    SENTRY_CELERY_IGNORE_EXPECTED = True
+    SENTRY_CELERY_IGNORE_EXPECTED = env("SENTRY_CELERY_IGNORE_EXPECTED", True,is_bool=True)
 
     # Docker
-    DOCKER_ENABLE = False
+    DOCKER_ENABLE = env("DOCKER_ENABLE", False,is_bool=True)
     DOCKER_SOCKET = 'unix:///var/run/docker.sock'
     # This settings has been deprecated in favor of DOCKER_IMAGE_SETTINGS
-    DOCKER_BUILD_IMAGES = None
+    DOCKER_BUILD_IMAGES = env("DOCKER_BUILD_IMAGES", None,is_bool=True)
 
     # User used to create the container.
     # In production we use the same user than the one defined by the
@@ -471,15 +481,15 @@ class CommunityBaseSettings(Settings):
     # In development, we can use the "UID:GID" of the current user running the
     # instance to avoid file permissions issues.
     # https://docs.docker.com/engine/reference/run/#user
-    RTD_DOCKER_USER = 'docs:docs'
-    RTD_DOCKER_SUPER_USER = 'root:root'
-    RTD_DOCKER_WORKDIR = '/home/docs/'
+    RTD_DOCKER_USER = env("RTD_DOCKER_USER", 'docs:docs')
+    RTD_DOCKER_SUPER_USER = env("RTD_DOCKER_SUPER_USER", 'root:root')
+    RTD_DOCKER_WORKDIR = env("RTD_DOCKER_WORKDIR", '/home/docs/')
 
-    RTD_DOCKER_COMPOSE = False
+    RTD_DOCKER_COMPOSE = env("RTD_DOCKER_COMPOSE", False,is_bool=True)
 
-    DOCKER_DEFAULT_IMAGE = 'readthedocs/build'
-    DOCKER_VERSION = 'auto'
-    DOCKER_DEFAULT_VERSION = 'latest'
+    DOCKER_DEFAULT_IMAGE = env("DOCKER_DEFAULT_IMAGE", 'readthedocs/build')
+    DOCKER_VERSION = env("DOCKER_VERSION", 'auto')
+    DOCKER_DEFAULT_VERSION = env("DOCKER_DEFAULT_VERSION", 'latest')
     DOCKER_IMAGE = '{}:{}'.format(DOCKER_DEFAULT_IMAGE, DOCKER_DEFAULT_VERSION)
     DOCKER_IMAGE_SETTINGS = {
         # A large number of users still have this pinned in their config file.
@@ -597,6 +607,7 @@ class CommunityBaseSettings(Settings):
                 "free -m | awk '/^Mem:/{print $2}'",
                 shell=True,
             ))
+
             return total_memory, round(total_memory - 1000, -2)
         except ValueError:
             # On systems without a `free` command it will return a string to
@@ -626,8 +637,10 @@ class CommunityBaseSettings(Settings):
         }
 
         # Only run on our servers
+
         if self.RTD_IS_PRODUCTION:
             total_memory, memory_limit = self._get_docker_memory_limit()
+
             if memory_limit:
                 limits = {
                     'memory': f'{memory_limit}m',
@@ -642,16 +655,17 @@ class CommunityBaseSettings(Settings):
             memory=limits['memory'],
             time=limits['time'],
         )
+
         return limits
 
     # All auth
-    ACCOUNT_ADAPTER = 'readthedocs.core.adapters.AccountAdapter'
-    ACCOUNT_EMAIL_REQUIRED = True
-    ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
-    ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
-    ACCOUNT_ACTIVATION_DAYS = 7
-    SOCIALACCOUNT_AUTO_SIGNUP = False
-    SOCIALACCOUNT_STORE_TOKENS = True
+    ACCOUNT_ADAPTER = env("ACCOUNT_ADAPTER", 'readthedocs.core.adapters.AccountAdapter')
+    ACCOUNT_EMAIL_REQUIRED = env("ACCOUNT_EMAIL_REQUIRED", True,is_bool=True)
+    ACCOUNT_EMAIL_VERIFICATION = env("ACCOUNT_EMAIL_VERIFICATION", 'mandatory')
+    ACCOUNT_AUTHENTICATION_METHOD = env("ACCOUNT_AUTHENTICATION_METHOD", 'username_email')
+    ACCOUNT_ACTIVATION_DAYS = env("ACCOUNT_ACTIVATION_DAYS", 7)
+    SOCIALACCOUNT_AUTO_SIGNUP = env("SOCIALACCOUNT_AUTO_SIGNUP", False,is_bool=True)
+    SOCIALACCOUNT_STORE_TOKENS = env("SOCIALACCOUNT_STORE_TOKENS", True,is_bool=True)
     SOCIALACCOUNT_PROVIDERS = {
         'github': {
             'SCOPE': [
@@ -675,7 +689,7 @@ class CommunityBaseSettings(Settings):
 
     # CORS
     # So cookies can be included in cross-domain requests where needed (eg. sustainability API).
-    CORS_ALLOW_CREDENTIALS = True
+    CORS_ALLOW_CREDENTIALS = env("CORS_ALLOW_CREDENTIALS", True,is_bool=True)
     CORS_ALLOW_HEADERS = (
         'x-requested-with',
         'content-type',
@@ -693,13 +707,13 @@ class CommunityBaseSettings(Settings):
     ]
 
     # RTD Settings
-    ALLOW_PRIVATE_REPOS = False
-    DEFAULT_PRIVACY_LEVEL = 'public'
-    DEFAULT_VERSION_PRIVACY_LEVEL = 'public'
-    ALLOW_ADMIN = True
+    ALLOW_PRIVATE_REPOS = env("ALLOW_PRIVATE_REPOS", False,is_bool=True)
+    DEFAULT_PRIVACY_LEVEL = env("DEFAULT_PRIVACY_LEVEL", 'public')
+    DEFAULT_VERSION_PRIVACY_LEVEL = env("DEFAULT_VERSION_PRIVACY_LEVEL", 'public')
+    ALLOW_ADMIN = env("ALLOW_ADMIN", True,is_bool=True)
 
     # Organization settings
-    RTD_ALLOW_ORGANIZATIONS = False
+    RTD_ALLOW_ORGANIZATIONS = env("RTD_ALLOW_ORGANIZATIONS", False,is_bool=True)
     ORG_DEFAULT_SUBSCRIPTION_PLAN_SLUG = 'trial-v2-monthly'
 
     # Elasticsearch settings.
@@ -751,7 +765,7 @@ class CommunityBaseSettings(Settings):
     # }
 
     # Disable auto refresh for increasing index performance
-    ELASTICSEARCH_DSL_AUTO_REFRESH = False
+    ELASTICSEARCH_DSL_AUTO_REFRESH = env("ELASTICSEARCH_DSL_AUTO_REFRESH", False,is_bool=True)
 
     ALLOWED_HOSTS = ['*']
 
@@ -767,13 +781,13 @@ class CommunityBaseSettings(Settings):
 
     # Stripe
     # Existing values we use
-    STRIPE_SECRET = None
-    STRIPE_PUBLISHABLE = None
+    STRIPE_SECRET = env("STRIPE_SECRET", None)
+    STRIPE_PUBLISHABLE = env("STRIPE_PUBLISHABLE", None)
 
     # DJStripe values -- **CHANGE THESE IN PRODUCTION**
-    STRIPE_LIVE_SECRET_KEY = None
-    STRIPE_TEST_SECRET_KEY = "sk_test_x" # A default so the `checks` don't fail
-    DJSTRIPE_WEBHOOK_SECRET = None
+    STRIPE_LIVE_SECRET_KEY = env("STRIPE_LIVE_SECRET_KEY", None)
+    STRIPE_TEST_SECRET_KEY = "sk_test_x"
+    DJSTRIPE_WEBHOOK_SECRET = env("DJSTRIPE_WEBHOOK_SECRET", None)
     STRIPE_LIVE_MODE = False  # Change to True in production
     # This is less optimal than setting the webhook secret
     # However, the app won't start without the secret
@@ -782,22 +796,22 @@ class CommunityBaseSettings(Settings):
 
     # These values shouldn't need to change..
     DJSTRIPE_FOREIGN_KEY_TO_FIELD = "id"
-    DJSTRIPE_USE_NATIVE_JSONFIELD = True  # We recommend setting to True for new installations
+    DJSTRIPE_USE_NATIVE_JSONFIELD = env("DJSTRIPE_USE_NATIVE_JSONFIELD", True,is_bool=True)
 
     # Do Not Track support
-    DO_NOT_TRACK_ENABLED = False
+    DO_NOT_TRACK_ENABLED = env("DO_NOT_TRACK_ENABLED", False,is_bool=True)
 
     # Advertising configuration defaults
-    ADSERVER_API_BASE = None
-    ADSERVER_API_KEY = None
-    ADSERVER_API_TIMEOUT = 0.35  # seconds
+    ADSERVER_API_BASE = env("ADSERVER_API_BASE", None)
+    ADSERVER_API_KEY = env("ADSERVER_API_KEY", None)
+    ADSERVER_API_TIMEOUT = env("ADSERVER_API_TIMEOUT", 0.35)
 
     # Misc application settings
-    GLOBAL_ANALYTICS_CODE = None
-    DASHBOARD_ANALYTICS_CODE = None  # For the dashboard, not docs
+    GLOBAL_ANALYTICS_CODE = env("GLOBAL_ANALYTICS_CODE", None)
+    DASHBOARD_ANALYTICS_CODE = env("DASHBOARD_ANALYTICS_CODE", None  )
     GRAVATAR_DEFAULT_IMAGE = 'https://assets.readthedocs.org/static/images/silhouette.png'  # NOQA
-    OAUTH_AVATAR_USER_DEFAULT_URL = GRAVATAR_DEFAULT_IMAGE
-    OAUTH_AVATAR_ORG_DEFAULT_URL = GRAVATAR_DEFAULT_IMAGE
+    OAUTH_AVATAR_USER_DEFAULT_URL = env("OAUTH_AVATAR_USER_DEFAULT_URL", GRAVATAR_DEFAULT_IMAGE)
+    OAUTH_AVATAR_ORG_DEFAULT_URL = env("OAUTH_AVATAR_ORG_DEFAULT_URL", GRAVATAR_DEFAULT_IMAGE)
     RESTRUCTUREDTEXT_FILTER_SETTINGS = {
         'cloak_email_addresses': True,
         'file_insertion_enabled': False,
@@ -914,7 +928,7 @@ class CommunityBaseSettings(Settings):
 
     # MailerLite API for newsletter signups
     MAILERLITE_API_SUBSCRIBERS_URL = 'https://api.mailerlite.com/api/v2/subscribers'
-    MAILERLITE_API_KEY = None
+    MAILERLITE_API_KEY = env("MAILERLITE_API_KEY", None)
 
     RTD_EMBED_API_EXTERNAL_DOMAINS = [
         r'docs\.python\.org',
@@ -922,14 +936,14 @@ class CommunityBaseSettings(Settings):
         r'docs\.sympy\.org',
         r'numpy\.org',
     ]
-    RTD_EMBED_API_PAGE_CACHE_TIMEOUT = 5 * 10
-    RTD_EMBED_API_DEFAULT_REQUEST_TIMEOUT = 1
-    RTD_EMBED_API_DOMAIN_RATE_LIMIT = 50
-    RTD_EMBED_API_DOMAIN_RATE_LIMIT_TIMEOUT = 60
+    RTD_EMBED_API_PAGE_CACHE_TIMEOUT = env("RTD_EMBED_API_PAGE_CACHE_TIMEOUT", 5 * 10)
+    RTD_EMBED_API_DEFAULT_REQUEST_TIMEOUT = env("RTD_EMBED_API_DEFAULT_REQUEST_TIMEOUT", 1)
+    RTD_EMBED_API_DOMAIN_RATE_LIMIT = env("RTD_EMBED_API_DOMAIN_RATE_LIMIT", 50)
+    RTD_EMBED_API_DOMAIN_RATE_LIMIT_TIMEOUT = env("RTD_EMBED_API_DOMAIN_RATE_LIMIT_TIMEOUT", 60)
 
-    RTD_SPAM_THRESHOLD_DONT_SHOW_ADS = 100
-    RTD_SPAM_THRESHOLD_DENY_ON_ROBOTS = 200
-    RTD_SPAM_THRESHOLD_DONT_SHOW_DASHBOARD = 300
-    RTD_SPAM_THRESHOLD_DONT_SERVE_DOCS = 500
-    RTD_SPAM_THRESHOLD_DELETE_PROJECT = 1000
-    RTD_SPAM_MAX_SCORE = 9999
+    RTD_SPAM_THRESHOLD_DONT_SHOW_ADS = env("RTD_SPAM_THRESHOLD_DONT_SHOW_ADS", 100)
+    RTD_SPAM_THRESHOLD_DENY_ON_ROBOTS = env("RTD_SPAM_THRESHOLD_DENY_ON_ROBOTS", 200)
+    RTD_SPAM_THRESHOLD_DONT_SHOW_DASHBOARD = env("RTD_SPAM_THRESHOLD_DONT_SHOW_DASHBOARD", 300)
+    RTD_SPAM_THRESHOLD_DONT_SERVE_DOCS = env("RTD_SPAM_THRESHOLD_DONT_SERVE_DOCS", 500)
+    RTD_SPAM_THRESHOLD_DELETE_PROJECT = env("RTD_SPAM_THRESHOLD_DELETE_PROJECT", 1000)
+    RTD_SPAM_MAX_SCORE = env("RTD_SPAM_MAX_SCORE", 9999)

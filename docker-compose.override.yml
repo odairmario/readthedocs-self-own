@@ -35,11 +35,11 @@ services:
       readthedocs:
         ipv4_address: 10.10.0.100
     environment:
-      - NGINX_WEB_SERVER_NAME=${NGINX_WEB_SERVER_NAME:-devthedocs.org}
-      - NGINX_PROXITO_SERVER_NAME=${NGINX_PROXITO_SERVER_NAME:-*.devthedocs.org *.build.devthedocs.org}
+      - NGINX_WEB_SERVER_NAME=${NGINX_WEB_SERVER_NAME:-docs.c3sl.ufpr.br}
+      - NGINX_PROXITO_SERVER_NAME=${NGINX_PROXITO_SERVER_NAME:-*.docs.c3sl.ufpr.br *.build.docs.c3sl.ufpr.br}
 
   proxito:
-    image: community_server:latest
+    image: selfhosted_server:latest
     volumes:
       - ${PWD}:/usr/src/app/checkouts/readthedocs.org
       - ${PWD}/dockerfiles/settings/proxito.py:/usr/src/app/checkouts/readthedocs.org/readthedocs/settings/proxito_docker.py
@@ -47,7 +47,7 @@ services:
       - DJANGO_SETTINGS_MODULE=readthedocs.settings.proxito_docker
 
   web:
-    image: community_server:latest
+    image: selfhosted_server:latest
     volumes:
       - ${PWD}:/usr/src/app/checkouts/readthedocs.org
       - ${PWD}/dockerfiles/settings/web.py:/usr/src/app/checkouts/readthedocs.org/readthedocs/settings/web_docker.py
@@ -55,10 +55,10 @@ services:
       - DJANGO_SETTINGS_MODULE=readthedocs.settings.web_docker
       - HOSTIP=${HOSTIP:-}
     extra_hosts:
-      - "${NGINX_WEB_SERVER_NAME:-devthedocs.org}:10.10.0.100"
+      - "${NGINX_WEB_SERVER_NAME:-docs.c3sl.ufpr.br}:10.10.0.100"
 
   celery:
-    image: community_server:latest
+    image: selfhosted_server:latest
     volumes:
       - ${PWD}:/usr/src/app/checkouts/readthedocs.org
       - ${PWD}/dockerfiles/settings/celery.py:/usr/src/app/checkouts/readthedocs.org/readthedocs/settings/celery_docker.py
@@ -67,7 +67,7 @@ services:
       - CELERY_APP_NAME=readthedocs
 
   build:
-    image: community_server:latest
+    image: selfhosted_server:latest
     volumes:
       - ${PWD}:/usr/src/app/checkouts/readthedocs.org
       - ${PWD}/dockerfiles/settings/build.py:/usr/src/app/checkouts/readthedocs.org/readthedocs/settings/build_docker.py
