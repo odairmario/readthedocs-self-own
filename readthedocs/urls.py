@@ -57,7 +57,7 @@ rtd_urls = [
     # For testing the 500's with DEBUG on.
     re_path(r'^500/$', handler500),
     # Put this as a unique path for the webhook, so we don't clobber existing Stripe URL's
-    re_path(r"^djstripe/", include("djstripe.urls", namespace="djstripe")),
+    #re_path(r"^djstripe/", include("djstripe.urls", namespace="djstripe")),
 ]
 
 project_urls = [
@@ -74,16 +74,16 @@ organization_urls = [
         r'^organizations/',
         include('readthedocs.organizations.urls.public'),
     ),
-    re_path(
-        r'^organizations/(?P<slug>[\w.-]+)/subscription/',
-        include('readthedocs.subscriptions.urls'),
-    ),
-    # NOTE: This is overridden in .com to serve a real pricing page.
-    re_path(
-        r'^pricing/',
-        RedirectView.as_view(url='https://readthedocs.org/sustainability/'),
-        name='pricing',
-    ),
+    #re_path(
+    #    r'^organizations/(?P<slug>[\w.-]+)/subscription/',
+    #    include('readthedocs.subscriptions.urls'),
+    #),
+    ## NOTE: This is overridden in .com to serve a real pricing page.
+    #re_path(
+    #    r'^pricing/',
+    #    RedirectView.as_view(url='https://readthedocs.org/sustainability/'),
+    #    name='pricing',
+    #),
 ]
 
 
@@ -122,6 +122,7 @@ dnt_urls = [
 ]
 
 debug_urls = []
+
 for build_format in ('epub', 'htmlzip', 'json', 'pdf'):
     debug_urls += static(
         settings.MEDIA_URL + build_format,

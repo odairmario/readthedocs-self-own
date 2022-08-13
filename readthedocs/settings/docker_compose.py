@@ -21,8 +21,8 @@ class DockerBaseSettings(CommunityDevSettings):
     PUBLIC_API_URL = f'http://{PRODUCTION_DOMAIN}'
 
     SLUMBER_API_HOST = env("SLUMBER_API_HOST", 'http://web:8000')
-    SLUMBER_USERNAME = env("SLUMBER_USERNAME", 'admin')
-    SLUMBER_PASSWORD = env("SLUMBER_PASSWORD", 'admin')
+    SLUMBER_USERNAME = env("ADMIN_USERNAME", 'admin')
+    SLUMBER_PASSWORD = env("ADMIN_PASSWORD", 'admin')
 
     RTD_EXTERNAL_VERSION_DOMAIN = env("RTD_EXTERNAL_VERSION_DOMAIN", 'build.docs.c3sl.ufpr.br')
 

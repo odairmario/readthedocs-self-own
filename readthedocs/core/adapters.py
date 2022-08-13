@@ -32,12 +32,14 @@ class AccountAdapter(DefaultAccountAdapter):
         # Allauth sends some additional data in the context, remove it if the
         # pieces can't be json encoded
         removed_keys = []
+
         for key in list(context.keys()):
             try:
                 _ = json.dumps(context[key])  # noqa for F841
             except (ValueError, TypeError):
                 removed_keys.append(key)
                 del context[key]
+
         if removed_keys:
             log.debug(
                 'Removed context we were unable to serialize.',
@@ -55,10 +57,12 @@ class AccountAdapter(DefaultAccountAdapter):
     def save_user(self, request, user, form, commit=True):
         """Override default account signup to link user to correct team."""
         user = super().save_user(request, user, form)
+
         if not settings.RTD_ALLOW_ORGANIZATIONS:
             return
 
         invite_id = request.session.get('invite')
+
         if invite_id:
             try:
                 teammember = TeamMember.objects.get(invite__pk=invite_id)
