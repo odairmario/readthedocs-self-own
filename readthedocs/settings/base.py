@@ -35,7 +35,7 @@ class CommunityBaseSettings(Settings):
     """Community base settings, don't use this directly."""
 
     # Django settings
-    SITE_ID = env("SITE_ID", 1)
+    SITE_ID = int(env("SITE_ID", 1))
     ROOT_URLCONF = env("ROOT_URLCONF", 'readthedocs.urls')
     LOGIN_REDIRECT_URL = env("LOGIN_REDIRECT_URL", '/dashboard/')
     FORCE_WWW = env("FORCE_WWW", False,is_bool=True)
@@ -103,6 +103,7 @@ class CommunityBaseSettings(Settings):
 
     # Content Security Policy
     # https://django-csp.readthedocs.io/
+    CSP_UPGRADE_INSECURE_REQUESTS = env("PUBLIC_DOMAIN_USES_HTTPS",False,is_bool=True) # to enable https
     CSP_BLOCK_ALL_MIXED_CONTENT = env("CSP_BLOCK_ALL_MIXED_CONTENT", True,is_bool=True)
     CSP_DEFAULT_SRC = env("CSP_DEFAULT_SRC", None)
     CSP_FRAME_ANCESTORS = ("'none'",)
@@ -182,7 +183,7 @@ class CommunityBaseSettings(Settings):
             'django_filters',
             'polymorphic',
             'simple_history',
-            'djstripe',
+            #'djstripe',
 
             # our apps
             'readthedocs.projects',
@@ -198,7 +199,7 @@ class CommunityBaseSettings(Settings):
             'readthedocs.api.v3',
 
             'readthedocs.gold',
-            'readthedocs.payments',
+            #'readthedocs.payments',
             'readthedocs.subscriptions',
             'readthedocs.notifications',
             'readthedocs.integrations',
@@ -212,10 +213,10 @@ class CommunityBaseSettings(Settings):
             'allauth',
             'allauth.account',
             'allauth.socialaccount',
-            'allauth.socialaccount.providers.github',
+            #'allauth.socialaccount.providers.github',
             'allauth.socialaccount.providers.gitlab',
-            'allauth.socialaccount.providers.bitbucket',
-            'allauth.socialaccount.providers.bitbucket_oauth2',
+            #'allauth.socialaccount.providers.bitbucket',
+            #'allauth.socialaccount.providers.bitbucket_oauth2',
         ]
 
         if ext:
@@ -667,15 +668,9 @@ class CommunityBaseSettings(Settings):
     SOCIALACCOUNT_AUTO_SIGNUP = env("SOCIALACCOUNT_AUTO_SIGNUP", False,is_bool=True)
     SOCIALACCOUNT_STORE_TOKENS = env("SOCIALACCOUNT_STORE_TOKENS", True,is_bool=True)
     SOCIALACCOUNT_PROVIDERS = {
-        'github': {
-            'SCOPE': [
-                'user:email',
-                'read:org',
-                'admin:repo_hook',
-                'repo:status',
-            ],
-        },
         'gitlab': {
+            'GITLAB_URL': 'https://gitlab.c3sl.ufpr.br',
+            "VERIFIED_EMAIL": True,
             'SCOPE': [
                 'api',
                 'read_user',
@@ -683,9 +678,9 @@ class CommunityBaseSettings(Settings):
         },
         # Bitbucket scope/permissions are determined by the Oauth consumer setup on bitbucket.org
     }
-    ACCOUNT_FORMS = {
-        'signup': 'readthedocs.forms.SignupFormWithNewsletter',
-    }
+    #ACCOUNT_FORMS = {
+    #    'signup': 'readthedocs.forms.SignupFormWithNewsletter',
+    #}
 
     # CORS
     # So cookies can be included in cross-domain requests where needed (eg. sustainability API).

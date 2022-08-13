@@ -26,6 +26,8 @@ services:
       args:
         GITHUB_USER: ${GITHUB_USER:-}
         GITHUB_TOKEN: ${GITHUB_TOKEN:-}
+    env_file:
+      - .env
 
   cache:
     image: redis:6.0.5
@@ -34,12 +36,22 @@ services:
     networks:
       readthedocs:
         ipv4_address: 10.10.0.100
+    volumes:
+      - /etc/ssl:/etc/ssl
+    env_file:
+      - .env
+    ports:
+      - "80:80"
+      - "443:443"
     environment:
       - NGINX_WEB_SERVER_NAME=${NGINX_WEB_SERVER_NAME:-docs.c3sl.ufpr.br}
       - NGINX_PROXITO_SERVER_NAME=${NGINX_PROXITO_SERVER_NAME:-*.docs.c3sl.ufpr.br *.build.docs.c3sl.ufpr.br}
 
+
   proxito:
     image: selfhosted_server:latest
+    env_file:
+      - .env
     volumes:
       - ${PWD}:/usr/src/app/checkouts/readthedocs.org
       - ${PWD}/dockerfiles/settings/proxito.py:/usr/src/app/checkouts/readthedocs.org/readthedocs/settings/proxito_docker.py
@@ -48,6 +60,8 @@ services:
 
   web:
     image: selfhosted_server:latest
+    env_file:
+      - .env
     volumes:
       - ${PWD}:/usr/src/app/checkouts/readthedocs.org
       - ${PWD}/dockerfiles/settings/web.py:/usr/src/app/checkouts/readthedocs.org/readthedocs/settings/web_docker.py
@@ -59,6 +73,8 @@ services:
 
   celery:
     image: selfhosted_server:latest
+    env_file:
+      - .env
     volumes:
       - ${PWD}:/usr/src/app/checkouts/readthedocs.org
       - ${PWD}/dockerfiles/settings/celery.py:/usr/src/app/checkouts/readthedocs.org/readthedocs/settings/celery_docker.py
@@ -68,6 +84,8 @@ services:
 
   build:
     image: selfhosted_server:latest
+    env_file:
+      - .env
     volumes:
       - ${PWD}:/usr/src/app/checkouts/readthedocs.org
       - ${PWD}/dockerfiles/settings/build.py:/usr/src/app/checkouts/readthedocs.org/readthedocs/settings/build_docker.py
